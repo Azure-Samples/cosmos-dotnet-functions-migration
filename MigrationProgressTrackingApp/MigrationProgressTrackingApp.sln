@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationProgressTrackingApp", "MigrationProgressTrackingApp\MigrationProgressTrackingApp.csproj", "{CC5E528E-3150-4630-B6E7-C2D7061AA1DB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC5E528E-3150-4630-B6E7-C2D7061AA1DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC5E528E-3150-4630-B6E7-C2D7061AA1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC5E528E-3150-4630-B6E7-C2D7061AA1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC5E528E-3150-4630-B6E7-C2D7061AA1DB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9F098519-BE36-4246-A247-63AEF10DAD62}
+	EndGlobalSection
+EndGlobal
