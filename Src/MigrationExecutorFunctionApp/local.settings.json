@@ -13,6 +13,7 @@
     "TargetDatabase": "<your Target Container's database name here>",
     "TargetCollection": "<your Target Container's name here>",
     "queueName": "your storage emulator queue name here",
+    //[SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="StorageEmulatorKey")]
     "queueConnectionString": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1"
   }
 }
