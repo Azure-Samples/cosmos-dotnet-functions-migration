@@ -4,7 +4,7 @@ languages:
 - csharp
 products:
 - dotnet
-description: "Azure Cosmos DB Live Container Migration Tool ofr .NET Core"
+description: "Azure Cosmos DB Live Container Migration Tool using Azure Functions"
 ---
 
 <img src="Images/CosmosDBLogo.svg" width="75">  &nbsp; Azure Cosmos DB Live Container Migration for .NET Core
