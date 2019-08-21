@@ -5,7 +5,6 @@ languages:
 products:
 - dotnet
 description: "Azure Cosmos DB Live Container Migration Tool ofr .NET Core"
-urlFragment: "update-this-to-unique-url-stub"
 ---
 
 <img src="Images/CosmosDBLogo.svg" width="75">  &nbsp; Azure Cosmos DB Live Container Migration for .NET Core

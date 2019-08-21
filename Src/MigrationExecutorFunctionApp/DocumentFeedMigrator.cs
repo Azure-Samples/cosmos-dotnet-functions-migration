@@ -41,9 +41,6 @@ namespace MigrationExecutorFunctionApp
             {
                 BulkImportResponse bulkImportResponse = null;
 
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = cancellationTokenSource.Token;
-
                 List<Task> tasks = new List<Task>();
 
                 tasks.Add(Task.Run(async () =>
@@ -55,7 +52,7 @@ namespace MigrationExecutorFunctionApp
                         enableUpsert: true,
                         disableAutomaticIdGeneration: true,
                         maxInMemorySortingBatchSize: 10000000,
-                        cancellationToken: cancellationToken);
+                        cancellationToken: default(CancellationToken));
                     }
                     catch (DocumentClientException e)
                     {
@@ -75,7 +72,7 @@ namespace MigrationExecutorFunctionApp
                         }
                     }
                 },
-                cancellationToken));
+                default(CancellationToken)));
 
                 await Task.WhenAll(tasks);
 
