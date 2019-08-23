@@ -54,14 +54,14 @@ The migration settings are exposed as environment variables and accessed by the 
 * *SourceCosmosDB* : The connection string to your Cosmos DB Database account that contains your Monitored Container that you would like to migrate
 * *SourceDatabase* : The name of the database that contains your Monitored Container.
 * *SourceCollection* : The name of your Monitored Container.
-* 
+  
 * *EndPoint* : The endpoint to your Azure Cosmos DB Database account that contains your *Target Container*.
 * *AuthKey* : The key to your Azure Cosmos DB Database account that contains your *Target Container*
-* 
+  
 * *TargetCosmosDB* : The connection string to your Cosmos DB Database account that contains your Target Container that you would like to migrate
 * *TargetDatabase* : The name of the database that contains your Target Container.
 * *TargetCollection* : The name of your Target Container.
-* 
+  
 * *QueueName* : The name of the storage queue.
 * *QueueConnectionString* : The connection string to the storage queue.
 
