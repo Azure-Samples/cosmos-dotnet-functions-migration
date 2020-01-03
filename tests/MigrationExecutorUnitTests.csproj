@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigrationExecutorFunctionApp\MigrationExecutorFunctionApp.csproj" />
+    <ProjectReference Include="..\src\MigrationExecutorFunctionApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
