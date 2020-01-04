@@ -1,19 +1,16 @@
 {
-  "_comment": "This file is only for local development pursposes and does not get deployed when you deploy this project in Azure Function Environment. Use it only if you wanna get a fell locally"
+  "_comment": "This file is only for local development purposes and does not get deployed when you deploy this project in Azure Function Environment. Use it only if you want to test locally",
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "SourceCosmosDB": "<Your connection string to your Monitored Container database account here>",
-    "sourceDatabase": "<your Monitored Container's database name here>",
-    "sourceCollection": "<your Monitored Container's name here>",
+    "SourceDatabase": "<your Monitored Container's database name here>",
+    "SourceCollection": "<your Monitored Container's name here>",
     "TargetCosmosDB": "<Your connection string to your Target Container databse account here>",
-    "EndPoint": "<your Target Container's database account endpoint uri here>",
-    "AuthKey": "<your Target Container's database account key here>",
     "TargetDatabase": "<your Target Container's database name here>",
     "TargetCollection": "<your Target Container's name here>",
-    "queueName": "your storage emulator queue name here",
-    //[SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="StorageEmulatorKey")]
-    "queueConnectionString": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1"
+    "PoisonQueueName": "<name of the Queue to store poison documents>",
+    "PoisonQueueConnectionString": "<Azure Storage Connection String to hold the poison documents Queue>"
   }
 }

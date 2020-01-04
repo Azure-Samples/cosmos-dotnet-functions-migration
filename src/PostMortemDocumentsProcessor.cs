@@ -4,32 +4,33 @@
 
 namespace MigrationExecutorFunctionApp
 {
-    using System;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Azure.Cosmos;
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
     
     public class PostMortemDocumentsProcessor
     {
-        private Uri targetContainerLink;
+        private Container containerToStoreDocuments;
 
-        public PostMortemDocumentsProcessor(Uri targetContainerLink)
+        public PostMortemDocumentsProcessor(Container containerToStoreDocuments)
         {
-            this.targetContainerLink = targetContainerLink;
+            this.containerToStoreDocuments = containerToStoreDocuments;
         }
          
         [FunctionName("PostMortemDocumentsProcessor")]
         public async Task Run(
-            [CosmosDB("%TargetDatabase%", "%TargetCollection%", ConnectionStringSetting = "TargetCosmosDB")]IDocumentClient client,
             [QueueTrigger("%QueueName%", Connection = "QueueConnectionString")]Document myQueueItem, 
-            ILogger log)
+            ILogger log,
+            CancellationToken cancellationToken)
         {
             try
             {
-                await client.UpsertDocumentAsync(this.targetContainerLink, myQueueItem);
+                await containerToStoreDocuments.CreateItemAsync(item: myQueueItem, cancellationToken: cancellationToken);
             }
-            catch (DocumentClientException e)
+            catch (CosmosException e)
             {
                 log.LogError(e, e.Message);
             }

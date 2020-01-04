@@ -5,22 +5,24 @@
 namespace MigrationExecutorFunctionApp
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Azure.CosmosDB.BulkExecutor;
-    using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
+    using Microsoft.Azure.Cosmos;
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
 
     public class DocumentFeedMigrator
     {
-        private IBulkExecutor bulkExecutor;
+        private Container containerToStoreDocuments;
 
-        public DocumentFeedMigrator(IBulkExecutor bulkExecutor)
+        public DocumentFeedMigrator(Container containerToStoreDocuments)
         {
-            this.bulkExecutor = bulkExecutor;
+            this.containerToStoreDocuments = containerToStoreDocuments;
         }
 
         [FunctionName("DocumentFeedMigrator")]
@@ -35,52 +37,39 @@ namespace MigrationExecutorFunctionApp
             MaxItemsPerInvocation = 10000000,
             CreateLeaseCollectionIfNotExists = true)
             ]IReadOnlyList<Document> documents,
-            ILogger log)
+            ILogger log,
+            CancellationToken cancellationToken)
         {
             if (documents != null && documents.Count > 0)
             {
-                BulkImportResponse bulkImportResponse = null;
-
+                ConcurrentDictionary<int, int> failedMetrics = new ConcurrentDictionary<int, int>();
                 List<Task> tasks = new List<Task>();
-
-                tasks.Add(Task.Run(async () =>
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                foreach (Document doc in documents)
                 {
-                    try
+                    tasks.Add(this.containerToStoreDocuments.CreateItemAsync(item: doc, cancellationToken: cancellationToken).ContinueWith((Task<ItemResponse<Document>> task) =>
                     {
-                        bulkImportResponse = await bulkExecutor.BulkImportAsync(
-                        documents: documents,
-                        enableUpsert: true,
-                        disableAutomaticIdGeneration: true,
-                        maxInMemorySortingBatchSize: 10000000,
-                        cancellationToken: default(CancellationToken));
-                    }
-                    catch (DocumentClientException e)
-                    {
-                        log.LogError("Document client Exception: {0}", e);
-                    }
-                    catch (Exception e)
-                    {
-                        log.LogError("Exception: {0}", e);
-                    }
+                        AggregateException innerExceptions = task.Exception.Flatten();
+                        CosmosException cosmosException = (CosmosException)innerExceptions.InnerExceptions.FirstOrDefault(innerEx => innerEx is CosmosException);
 
-                    if (bulkImportResponse.BadInputDocuments != null && bulkImportResponse.BadInputDocuments.Count > 0)
-                    {
-                        foreach (Document doc in bulkImportResponse.BadInputDocuments)
-                        {
-                            await postMortemQueue.AddAsync(doc);
-                            log.LogInformation("Document added to the post-mortem queue: {0}", doc.Id);
-                        }
-                    }
-                },
-                default(CancellationToken)));
+                        failedMetrics.AddOrUpdate((int)cosmosException.StatusCode, 0, (key, value) => value + 1);
+
+                        return postMortemQueue.AddAsync(doc);
+                    }, TaskContinuationOptions.OnlyOnFaulted));
+                }
 
                 await Task.WhenAll(tasks);
+                stopwatch.Stop();
 
-                log.LogMetric("The Number of Documents Imported", bulkImportResponse.NumberOfDocumentsImported);
-                log.LogMetric("The Total Number of RU/s consumed", bulkImportResponse.TotalRequestUnitsConsumed);
-                log.LogMetric("RU/s per Document Write", bulkImportResponse.TotalRequestUnitsConsumed / bulkImportResponse.NumberOfDocumentsImported);
-                log.LogMetric("RU/s being used", bulkImportResponse.TotalRequestUnitsConsumed / bulkImportResponse.TotalTimeTaken.TotalSeconds);
-                log.LogMetric("Migration Time", bulkImportResponse.TotalTimeTaken.TotalMinutes);
+                int totalFailedItems = 0;
+                foreach (KeyValuePair<int, int> failedMetric in failedMetrics)
+                {
+                    log.LogMetric($"Failed items with StatusCode {failedMetric.Key}", failedMetric.Value);
+                    totalFailedItems += failedMetric.Value;
+                }
+
+                log.LogMetric("Documents migrated", documents.Count - totalFailedItems);
+                log.LogMetric("Migration Time in ms", stopwatch.ElapsedMilliseconds);
             }
         }
     }
