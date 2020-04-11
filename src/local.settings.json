@@ -4,13 +4,17 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "SourceCosmosDB": "<Your connection string to your Monitored Container database account here>",
-    "SourceDatabase": "<your Monitored Container's database name here>",
-    "SourceCollection": "<your Monitored Container's name here>",
-    "TargetCosmosDB": "<Your connection string to your Target Container databse account here>",
-    "TargetDatabase": "<your Target Container's database name here>",
-    "TargetCollection": "<your Target Container's name here>",
-    "PoisonQueueName": "<name of the Queue to store poison documents>",
-    "PoisonQueueConnectionString": "<Azure Storage Connection String to hold the poison documents Queue>"
+    "SourceCosmosDB": "AccountEndpoint=https://tvk-sqlapi.documents.azure.com:443/;AccountKey=YdtPFdcmsOTSrPzyobK2tqRJzDmQwkn4EDsBaZimDZwiwGP2qsc8YAEMDF3xk0NDwf0acP4cvwHgJrXSJ6kU8A==;",
+    "SourceDatabase": "database",
+    "SourceCollection": "container1",
+    "TargetCosmosDB": "AccountEndpoint=https://tvk-sqlapi.documents.azure.com:443/;AccountKey=YdtPFdcmsOTSrPzyobK2tqRJzDmQwkn4EDsBaZimDZwiwGP2qsc8YAEMDF3xk0NDwf0acP4cvwHgJrXSJ6kU8A==;",
+    "TargetDatabase": "database",
+    "TargetCollection": "container2",
+    "TargetPartitionKeyAttribute": "pk1",
+    "SourcePartitionKeyMapping": "//id",
+    "QueueName": "Queue",
+    "QueueConnectionString": "UseDevelopmentStorage=true",
+    "BulkMigratorConnectionString": "UseDevelopmentStorage=true",
+    "DoBulkMIgrate": "true"
   }
 }

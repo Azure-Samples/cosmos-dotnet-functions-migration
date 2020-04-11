@@ -4,21 +4,31 @@
 
 namespace MigrationExecutorFunctionApp
 {
+    using Microsoft.Azure.Cosmos;
+    using Microsoft.Azure.Documents;
+    using Microsoft.Azure.WebJobs;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Runtime.Serialization.Json;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Azure.Cosmos;
-    using Microsoft.Azure.Documents;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Extensions.Logging;
+    using System.Xml.Linq;
+    using System.Xml.XPath;
 
     public class DocumentFeedMigrator
     {
         private Container containerToStoreDocuments;
+        private string pkname = "pk1";
+        string targetPartitionKeyAttribute = Environment.GetEnvironmentVariable($"{"TargetPartitionKeyAttribute"}");
+        static string sourcePartitionKeyMapping = Environment.GetEnvironmentVariable($"{"SourcePartitionKeyMapping"}");
+        //string[] sourcePartitionKeyMaps = sourcePartitionKeyMapping.Split(',');
 
         public DocumentFeedMigrator(Container containerToStoreDocuments)
         {
@@ -47,14 +57,22 @@ namespace MigrationExecutorFunctionApp
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 foreach (Document doc in documents)
                 {
-                    tasks.Add(this.containerToStoreDocuments.CreateItemAsync(item: doc, cancellationToken: cancellationToken).ContinueWith((Task<ItemResponse<Document>> task) =>
+                    dynamic json = JsonConvert.DeserializeObject(doc.ToString());
+                    var jsonReader = JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(doc.ToString()), new System.Xml.XmlDictionaryReaderQuotas());
+                    var root = XElement.Load(jsonReader);
+                    string newValue = root.XPathSelectElement(sourcePartitionKeyMapping).Value;
+                    json[targetPartitionKeyAttribute] = newValue;
+                    Document document = new Document();
+                    JsonReader reader = new JTokenReader(json);                   
+                    document.LoadFrom(reader);
+                    tasks.Add(this.containerToStoreDocuments.CreateItemAsync(item: document, cancellationToken: cancellationToken).ContinueWith((Task<ItemResponse<Document>> task) =>
                     {
                         AggregateException innerExceptions = task.Exception.Flatten();
                         CosmosException cosmosException = (CosmosException)innerExceptions.InnerExceptions.FirstOrDefault(innerEx => innerEx is CosmosException);
 
                         failedMetrics.AddOrUpdate((int)cosmosException.StatusCode, 0, (key, value) => value + 1);
 
-                        return postMortemQueue.AddAsync(doc);
+                        return postMortemQueue.AddAsync(document);
                     }, TaskContinuationOptions.OnlyOnFaulted));
                 }
 
@@ -71,6 +89,7 @@ namespace MigrationExecutorFunctionApp
                 log.LogMetric("Documents migrated", documents.Count - totalFailedItems);
                 log.LogMetric("Migration Time in ms", stopwatch.ElapsedMilliseconds);
             }
+
         }
     }
 }
