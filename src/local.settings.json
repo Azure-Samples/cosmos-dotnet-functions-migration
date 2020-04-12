@@ -11,9 +11,9 @@
     "TargetDatabase": "database",
     "TargetCollection": "container2",
     "TargetPartitionKeyAttribute": "pk1",
-    "SourcePartitionKeyMapping": "//id",
-    "QueueName": "Queue",
-    "QueueConnectionString": "UseDevelopmentStorage=true",
+    "SourcePartitionKeyMapping": "id",
+    "QueueName": "queue",
+    "QueueConnectionString": "DefaultEndpointsProtocol=https;AccountName=functionregion2202003180;AccountKey=GOE9IgVXwEIUUgrO99BeDUmdwNO3OwICKRDTj1tcfDzq9zKJ6hAMSSeVqnasMec6RJn5VeTwl/Md9jZvN5FzZw==;QueueEndpoint=https://functionregion2202003180.queue.core.windows.net",
     "BulkMigratorConnectionString": "UseDevelopmentStorage=true",
     "DoBulkMIgrate": "true"
   }
