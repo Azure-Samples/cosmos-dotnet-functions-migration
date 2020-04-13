@@ -4,17 +4,15 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "SourceCosmosDB": "AccountEndpoint=https://tvk-sqlapi.documents.azure.com:443/;AccountKey=YdtPFdcmsOTSrPzyobK2tqRJzDmQwkn4EDsBaZimDZwiwGP2qsc8YAEMDF3xk0NDwf0acP4cvwHgJrXSJ6kU8A==;",
+    "SourceCosmosDB": "",
     "SourceDatabase": "database",
     "SourceCollection": "container1",
-    "TargetCosmosDB": "AccountEndpoint=https://tvk-sqlapi.documents.azure.com:443/;AccountKey=YdtPFdcmsOTSrPzyobK2tqRJzDmQwkn4EDsBaZimDZwiwGP2qsc8YAEMDF3xk0NDwf0acP4cvwHgJrXSJ6kU8A==;",
+    "TargetCosmosDB": "",
     "TargetDatabase": "database",
     "TargetCollection": "container2",
-    "TargetPartitionKeyAttribute": "pk1",
-    "SourcePartitionKeyMapping": "id",
+    "TargetPartitionKeyAttribute": "partitionKey",
+    "SourcePartitionKeyMapping": "deviceid,timestamp",
     "QueueName": "queue",
-    "QueueConnectionString": "DefaultEndpointsProtocol=https;AccountName=functionregion2202003180;AccountKey=GOE9IgVXwEIUUgrO99BeDUmdwNO3OwICKRDTj1tcfDzq9zKJ6hAMSSeVqnasMec6RJn5VeTwl/Md9jZvN5FzZw==;QueueEndpoint=https://functionregion2202003180.queue.core.windows.net",
-    "BulkMigratorConnectionString": "UseDevelopmentStorage=true",
-    "DoBulkMIgrate": "true"
+    "QueueConnectionString": "DefaultEndpointsProtocol=https;AccountName=<storage account name>;AccountKey=<storage account key>;QueueEndpoint=https://<storage account name>.queue.core.windows.net"
   }
 }

@@ -15,6 +15,7 @@ namespace MigrationExecutorFunctionApp
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -37,7 +38,6 @@ namespace MigrationExecutorFunctionApp
             ConnectionStringSetting = "SourceCosmosDB",
             LeaseCollectionName = "leases",
             StartFromBeginning = true,
-            
             MaxItemsPerInvocation = 10000000,
             CreateLeaseCollectionIfNotExists = true)
             ]IReadOnlyList<Document> documents,
@@ -49,13 +49,10 @@ namespace MigrationExecutorFunctionApp
                 ConcurrentDictionary<int, int> failedMetrics = new ConcurrentDictionary<int, int>();
                 List<Task> tasks = new List<Task>();
                 Stopwatch stopwatch = Stopwatch.StartNew();
+                Document document = new Document();
                 foreach (Document doc in documents)
                 {
-                    dynamic json = JsonConvert.DeserializeObject(doc.ToString());
-                    json[targetPartitionKeyAttribute] = json[sourcePartitionKeyMapping];
-                    Document document = new Document();
-                    JsonReader reader = new JTokenReader(json);
-                    document.LoadFrom(reader);
+                    document = sourcePartitionKeyMapping != null ? MapPartitionKey(document, doc): document = doc;
                     tasks.Add(this.containerToStoreDocuments.CreateItemAsync(item: document, cancellationToken: cancellationToken).ContinueWith((Task<ItemResponse<Document>> task) =>
                     {
                         AggregateException innerExceptions = task.Exception.Flatten();
@@ -73,11 +70,24 @@ namespace MigrationExecutorFunctionApp
                     log.LogMetric($"Failed items with StatusCode {failedMetric.Key}", failedMetric.Value);
                     totalFailedItems += failedMetric.Value;
                 }
-
                 log.LogMetric("Documents migrated", documents.Count - totalFailedItems);
                 log.LogMetric("Migration Time in ms", stopwatch.ElapsedMilliseconds);
             }
 
+        }
+
+        public Document MapPartitionKey(Document document, Document doc)
+        {
+            dynamic json = JsonConvert.DeserializeObject(doc.ToString());
+            StringBuilder syntheticKey = new StringBuilder();
+            string[] sourceAttributeArray = sourcePartitionKeyMapping.Split(',');
+            foreach (string attribute in sourceAttributeArray) {
+                syntheticKey.Append(json[attribute]);
+            }
+            json[targetPartitionKeyAttribute] = syntheticKey.ToString();
+            JsonReader reader = new JTokenReader(json);
+            document.LoadFrom(reader);
+            return document;
         }
     }
 }
