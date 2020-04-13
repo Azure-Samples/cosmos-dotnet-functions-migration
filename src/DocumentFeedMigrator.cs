@@ -8,8 +8,6 @@ namespace MigrationExecutorFunctionApp
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -19,11 +17,14 @@ namespace MigrationExecutorFunctionApp
     using System.Threading;
     using System.Threading.Tasks;
 
+
+
     public class DocumentFeedMigrator
     {
         private Container containerToStoreDocuments;
         string targetPartitionKeyAttribute = Environment.GetEnvironmentVariable($"{"TargetPartitionKeyAttribute"}");
-        static string sourcePartitionKeyMapping = Environment.GetEnvironmentVariable($"{"SourcePartitionKeyMapping"}");
+        static string sourcePartitionKeyMapping = Environment.GetEnvironmentVariable($"{"SourcePartitionKeyMapping"}");    
+        Boolean isSyntheticKey = Environment.GetEnvironmentVariable($"{"SourcePartitionKeyMapping"}").IndexOf(",") == -1? false: true;
         public DocumentFeedMigrator(Container containerToStoreDocuments)
         {
             this.containerToStoreDocuments = containerToStoreDocuments;
@@ -52,7 +53,7 @@ namespace MigrationExecutorFunctionApp
                 Document document = new Document();
                 foreach (Document doc in documents)
                 {
-                    document = sourcePartitionKeyMapping != null ? MapPartitionKey(document, doc): document = doc;
+                    document = sourcePartitionKeyMapping != null ? MapPartitionKey(doc): document = doc;
                     tasks.Add(this.containerToStoreDocuments.CreateItemAsync(item: document, cancellationToken: cancellationToken).ContinueWith((Task<ItemResponse<Document>> task) =>
                     {
                         AggregateException innerExceptions = task.Exception.Flatten();
@@ -76,18 +77,39 @@ namespace MigrationExecutorFunctionApp
 
         }
 
-        public Document MapPartitionKey(Document document, Document doc)
+        public Document MapPartitionKey(Document doc)
         {
-            dynamic json = JsonConvert.DeserializeObject(doc.ToString());
+            if(isSyntheticKey)
+            {
+                doc = CreateSyntheticKey(doc);
+            }
+            else
+            {
+                doc.SetPropertyValue(targetPartitionKeyAttribute, doc.GetPropertyValue<string>(sourcePartitionKeyMapping));
+            }
+            return doc;
+        }
+
+        public Document CreateSyntheticKey(Document doc)
+        {
             StringBuilder syntheticKey = new StringBuilder();
             string[] sourceAttributeArray = sourcePartitionKeyMapping.Split(',');
-            foreach (string attribute in sourceAttributeArray) {
-                syntheticKey.Append(json[attribute]);
+            int arraylength = sourceAttributeArray.Length;
+            int count = 1;
+            foreach (string attribute in sourceAttributeArray)
+            {
+                if (count == arraylength)
+                {
+                    syntheticKey.Append(doc.GetPropertyValue<string>(attribute));
+                }
+                else
+                {
+                    syntheticKey.Append(doc.GetPropertyValue<string>(attribute) + "-");
+                }
+                count++;
             }
-            json[targetPartitionKeyAttribute] = syntheticKey.ToString();
-            JsonReader reader = new JTokenReader(json);
-            document.LoadFrom(reader);
-            return document;
+            doc.SetPropertyValue(targetPartitionKeyAttribute, syntheticKey.ToString());
+            return doc;
         }
     }
 }
