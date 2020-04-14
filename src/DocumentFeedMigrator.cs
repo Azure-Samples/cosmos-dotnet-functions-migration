@@ -4,10 +4,6 @@
 
 namespace MigrationExecutorFunctionApp
 {
-    using Microsoft.Azure.Cosmos;
-    using Microsoft.Azure.Documents;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -16,6 +12,10 @@ namespace MigrationExecutorFunctionApp
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Azure.Cosmos;
+    using Microsoft.Azure.Documents;
+    using Microsoft.Azure.WebJobs;
+    using Microsoft.Extensions.Logging;
 
 
 
