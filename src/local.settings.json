@@ -13,6 +13,6 @@
     "TargetPartitionKeyAttribute": "partitionKey",
     "SourcePartitionKeyMapping": "deviceid,timestamp",
     "QueueName": "queue",
-    "QueueConnectionString": "DefaultEndpointsProtocol=https;AccountName=<storage account name>;AccountKey=<storage account key>;QueueEndpoint=https://<storage account name>.queue.core.windows.net"
+    "QueueConnectionString": "DefaultEndpointsProtocol=https;AccountName=<storage account name>;AccountKey=<storage account key>;"
   }
 }
