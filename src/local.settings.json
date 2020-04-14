@@ -4,10 +4,10 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "SourceCosmosDB": "",
+    "SourceCosmosDB": "SourceCosmosDB connection string",
     "SourceDatabase": "database",
     "SourceCollection": "container1",
-    "TargetCosmosDB": "",
+    "TargetCosmosDB": "TargetCosmosDB connection string",
     "TargetDatabase": "database",
     "TargetCollection": "container2",
     "TargetPartitionKeyAttribute": "partitionKey",
