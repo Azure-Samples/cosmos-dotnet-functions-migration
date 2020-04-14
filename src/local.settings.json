@@ -4,13 +4,15 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "SourceCosmosDB": "<Your connection string to your Monitored Container database account here>",
-    "SourceDatabase": "<your Monitored Container's database name here>",
-    "SourceCollection": "<your Monitored Container's name here>",
-    "TargetCosmosDB": "<Your connection string to your Target Container databse account here>",
-    "TargetDatabase": "<your Target Container's database name here>",
-    "TargetCollection": "<your Target Container's name here>",
-    "PoisonQueueName": "<name of the Queue to store poison documents>",
-    "PoisonQueueConnectionString": "<Azure Storage Connection String to hold the poison documents Queue>"
+    "SourceCosmosDB": "SourceCosmosDB connection string",
+    "SourceDatabase": "database",
+    "SourceCollection": "container1",
+    "TargetCosmosDB": "TargetCosmosDB connection string",
+    "TargetDatabase": "database",
+    "TargetCollection": "container2",
+    "TargetPartitionKeyAttribute": "partitionKey",
+    "SourcePartitionKeyMapping": "deviceid,timestamp",
+    "QueueName": "queue",
+    "QueueConnectionString": "DefaultEndpointsProtocol=https;AccountName=<storage account name>;AccountKey=<storage account key>;"
   }
 }
